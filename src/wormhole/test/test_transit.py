@@ -134,15 +134,16 @@ class Misc(unittest.TestCase):
 class Hints(unittest.TestCase):
     def test_endpoint_from_hint_obj(self):
         c = transit.Common("")
-        ep = c._endpoint_from_hint_obj(transit.DirectTCPV1Hint("localhost", 1234))
+        ep = c._endpoint_from_hint_obj(transit.DirectTCPV1Hint("localhost",
+                                                               1234, 0.0))
         self.assertIsInstance(ep, endpoints.HostnameEndpoint)
         ep = c._endpoint_from_hint_obj("unknown:stuff:yowza:pivlor")
         self.assertEqual(ep, None)
 
     def test_comparable(self):
-        h1 = transit.DirectTCPV1Hint("hostname", "port1")
-        h1b = transit.DirectTCPV1Hint("hostname", "port1")
-        h2 = transit.DirectTCPV1Hint("hostname", "port2")
+        h1 = transit.DirectTCPV1Hint("hostname", "port1", 0.0)
+        h1b = transit.DirectTCPV1Hint("hostname", "port1", 0.0)
+        h2 = transit.DirectTCPV1Hint("hostname", "port2", 0.0)
         r1 = transit.RelayV1Hint(tuple(sorted([h1, h2])))
         r2 = transit.RelayV1Hint(tuple(sorted([h2, h1])))
         r3 = transit.RelayV1Hint(tuple(sorted([h1b, h2])))
@@ -159,8 +160,9 @@ class Basic(unittest.TestCase):
         hints = yield c.get_connection_hints()
         self.assertEqual(hints, [{"type": "relay-v1",
                                   "hints": [{"type": "direct-tcp-v1",
-                                            "hostname": "host",
-                                            "port": 1234}],
+                                             "hostname": "host",
+                                             "port": 1234,
+                                             "priority": 0.0}],
                                   }])
         self.assertRaises(InternalError, transit.Common, 123)
 
@@ -1221,8 +1223,8 @@ RELAY_HINT2 = {"type": "relay-v1",
                           UNRECOGNIZED_HINT]}
 UNAVAILABLE_RELAY_HINT = {"type": "relay-v1",
                           "hints": [UNAVAILABLE_HINT]}
-DIRECT_HINT_INTERNAL = transit.DirectTCPV1Hint("direct", 1234)
-RELAY_HINT_FIRST = transit.DirectTCPV1Hint("relay", 1234)
+DIRECT_HINT_INTERNAL = transit.DirectTCPV1Hint("direct", 1234, 0.0)
+RELAY_HINT_FIRST = transit.DirectTCPV1Hint("relay", 1234, 0.0)
 RELAY_HINT_INTERNAL = transit.RelayV1Hint((RELAY_HINT_FIRST,))
 
 class Transit(unittest.TestCase):
